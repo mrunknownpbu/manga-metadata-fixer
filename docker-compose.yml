@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  manga-metadata-fixer:
+    build: .
+    ports:
+      - "1996:1996"
+    environment:
+      # Komga Configuration
+      - KOMGA_API_URL=http://komga:8080/api
+      - KOMGA_API_TOKEN=${KOMGA_API_TOKEN:-your_komga_token_here}
+      
+      # Kavita Configuration  
+      - KAVITA_API_URL=http://kavita:5000/api
+      - KAVITA_API_TOKEN=${KAVITA_API_TOKEN:-your_kavita_token_here}
+      
+      # Application Configuration
+      - PORT=1996
+      - FLASK_DEBUG=false
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:1996/', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Example Komga service (uncomment and configure as needed)
+  # komga:
+  #   image: gotson/komga:latest
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - komga_data:/config
+  #     - /path/to/your/manga:/data
+  #   environment:
+  #     - KOMGA_OAUTH2_ACCOUNT_CREATION=true
+  #   restart: unless-stopped
+
+  # Example Kavita service (uncomment and configure as needed)  
+  # kavita:
+  #   image: kizaing/kavita:latest
+  #   ports:
+  #     - "5000:5000"
+  #   volumes:
+  #     - kavita_data:/kavita/config
+  #     - /path/to/your/manga:/manga
+  #   restart: unless-stopped
+
+# volumes:
+#   komga_data:
+#   kavita_data:
